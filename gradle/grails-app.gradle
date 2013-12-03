@@ -1,0 +1,242 @@
+import org.grails.gradle.plugin.GrailsPlugin
+import org.grails.gradle.plugin.GrailsTask
+
+apply plugin: 'java-base'
+apply plugin: 'groovy-base'
+apply plugin: 'build-dashboard'
+apply plugin: GrailsPlugin
+apply plugin: 'project-report'
+apply plugin: 'idea'
+
+ext.minHeapSize = '256m'
+ext.maxHeapSize = '512m'
+ext.maxPermSize = '256m'
+
+grails {
+    grailsVersion project.grailsVersion
+    springLoadedVersion '1.1.4'
+}
+
+repositories {
+    maven {
+        name 'Bloom Artifactory'
+        credentials {
+            username bloom_artifactory_username
+            password bloom_artifactory_password
+        }
+        url "${bloom_artifactory_contextUrl}/repo"
+    }
+    maven {
+        name 'Grails Artifactory'
+        url 'http://repo.grails.org/grails/repo'
+    }
+    maven {
+        name 'Spring Source Artifactory'
+        url 'http://repo.springsource.org/repo'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    bootstrap "org.grails.plugins:tomcat:${grails.grailsVersion}"
+
+    compile 'org.grails.plugins:joda-time:1.4'
+
+    test('org.grails.plugins:spock:0.7') {
+        exclude group: 'org.spockframework', module: 'spock-grails-support'
+    }
+    test 'org.spockframework:spock-grails-support:0.7-groovy-2.0'
+    test 'junit:junit:4.11'
+    test 'org.objenesis:objenesis:1.2'
+
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.name == 'groovy') {
+            details.useTarget group: details.requested.group, name: 'groovy-all', version: groovyVersion
+        }
+        if (details.requested.name == 'groovy-all') {
+            details.useVersion groovyVersion
+        }
+        if (details.requested.name == 'spock-core') {
+            details.useVersion spockVersion
+        }
+    }
+}
+
+sourceSets.create('main')
+sourceSets.create('test')
+
+sourceSets.main.java.setSrcDirs(['src/java'])
+sourceSets.main.groovy.with {
+    setSrcDirs(['grails-app/conf',
+        'grails-app/controllers',
+        'grails-app/domain',
+        'grails-app/services',
+        'grails-app/taglib',
+        'grails-app/utils',
+        'grails-app/views',
+        'src/groovy',
+        'scripts'])
+    filter {
+        exclude 'grails-app/conf/hibernate'
+        exclude 'grails-app/conf/spring'
+    }
+}
+sourceSets.main.resources.with {
+    setSrcDirs(['grails-app/conf/hibernate',
+        'grails-app/conf/spring',
+        'web-app/images',
+        'web-app/bower_components',
+        'web-app/WEB-INF'])
+}
+sourceSets.main.output.with {
+    classesDir = "${buildDir}/classes"
+    dir "${buildDir}/plugin-build-classes"
+    dir "${buildDir}/plugin-classes"
+    dir "${buildDir}/plugin-provided-classes"
+    dir "${buildDir}/plugins"
+    resourcesDir = "${buildDir}/resources"
+}
+sourceSets.test.groovy.with {
+    setSrcDirs(['test/functional', 'test/integration', 'test/unit'])
+}
+sourceSets.test.output.classesDir = "${buildDir}/test-classes"
+
+//Configure IntelliJ to connect the source/test directories
+project.ideaModule {
+    module.conventionMapping.sourceDirs = { project.sourceSets.main.allSource.srcDirs as LinkedHashSet }
+    module.conventionMapping.testSourceDirs = { project.sourceSets.test.allSource.srcDirs as LinkedHashSet }
+}
+
+task setVersion(type: GrailsTask) {
+    inputs.property('version', version)
+    command 'set-version'
+    args version
+}
+
+task classes(type: GrailsTask, overwrite: true) {
+    dependsOn setVersion
+    inputs.source sourceSets.main.allSource
+    outputs.dir sourceSets.main.output.classesDir
+    sourceSets.main.output.dirs.each {
+        outputs.dir it
+    }
+    command 'package'
+}
+
+/**
+ * Supports running specific Grails test types (ex. 'unit' or 'integration').
+ *
+ * Examples:
+ * To run all unit tests, run 'gradle grailsTestUnit'
+ * To run a single unit test, run 'gradle -Dtest.single=MyServiceSpec grailsTestUnit'
+ */
+tasks.addRule("Pattern: grailsTest<Phase>") { String taskName ->
+    if (taskName.startsWith('grailsTest') && taskName != 'grailsTest') {
+
+        task(taskName, type: GrailsTask, dependsOn: classes) {
+            String testType = (taskName - 'grailsTest').toLowerCase()
+            String testName = System.getProperty('test.single', '')
+
+            env = 'test'
+            command 'test-app'
+            args = "${testType}: ${testName}"
+        }
+    }
+}
+
+task grailsTest(type: GrailsTask) {
+    inputs.source sourceSets.test.allSource
+    inputs.source sourceSets.main.allSource
+    outputs.dir sourceSets.test.output.classesDir
+    outputs.dir sourceSets.main.output.classesDir
+    env = 'test'
+    dependsOn classes
+    command 'test-app'
+
+    String testName = System.getProperty('test.single', '')
+    String phase = System.getProperty('test.phase', 'unit: integration:')
+
+    args = "${phase} ${testName}"
+}
+
+task grailsTestDebug(type: GrailsTask) {
+    inputs.source sourceSets.test.allSource
+    inputs.source sourceSets.main.allSource
+    outputs.dir sourceSets.test.output.classesDir
+    outputs.dir sourceSets.main.output.classesDir
+    outputs.upToDateWhen{ false }
+    env = 'test'
+    dependsOn classes
+    command 'test-app'
+
+    String testName = System.getProperty('test.single', '')
+    String phase = System.getProperty('test.phase', 'unit: integration:')
+
+    args = "${phase} ${testName}"
+    jvmOptions {
+        debug = false
+        jvmArgs([
+            '-Xdebug',
+            '-Xnoagent',
+            '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005'
+        ])
+    }
+}
+
+//Overwrite the built in test task so we can make grails test not dependent on JS Unit tests
+task test(overwrite: true, type: DefaultTask)
+
+//Don't need this dependency. Removing build/ is good enough
+clean.dependsOn.remove(tasks.findByName('grails-clean'))
+
+// Task Dependencies (Non-Grunt/JS tasks)
+check.dependsOn codenarcMain, codenarcTest, test
+test.dependsOn grailsTest
+
+gradle.taskGraph.whenReady {
+    tasks.withType(GrailsTask).all {
+        jvmOptions {
+            minHeapSize = project.minHeapSize
+            maxHeapSize = project.maxHeapSize
+            jvmArgs("-XX:MaxPermSize=${project.maxPermSize}")
+        }
+        //Plugin is currently defining this property as an @Input but it's no Serializable and throws errors
+        inputs.@properties.remove('jvmOptions')
+        //Plugin currently puts springloaded in the classpath for every Grails task. This is bad.
+        //It should only be on the classpath when running the application.
+        if (name != 'grails-run-app') {
+            conventionMapping.map('springloaded') { null }
+        }
+    }
+}
+
+group "${rootProject.group}.webapps"
+
+dependencies {
+    compile 'org.grails.plugins:jdbc-pool:7.0.37'
+
+    runtime 'org.grails.plugins:resources:1.2'
+}
+
+setVersion.outputs.file project.file('application.properties')
+
+task 'grails-debug-app'(type: GrailsTask) {
+    dependsOn classes
+    command 'run-app'
+
+    jvmOptions {
+        debug = false //disable the default debug setting since it suspends on start and set the properties we want below
+        jvmArgs([
+                '-Xdebug',
+                '-Xnoagent',
+                '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
+        ])
+    }
+}
+
+'grails-run-app' {
+    dependsOn classes
+}

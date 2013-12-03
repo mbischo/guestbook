@@ -1,0 +1,9 @@
+apply from: rootProject.file('gradle/grails-app.gradle')
+apply from: rootProject.file('gradle/js.gradle')
+
+dependencies {
+    compile("org.grails:grails-plugin-async:${grails.grailsVersion}") {
+        exclude group: 'javax', module: 'javaee-web-api'
+        exclude group: 'javax.servlet', module: 'javax.servlet-api'
+    }
+}

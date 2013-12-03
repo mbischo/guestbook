@@ -1,0 +1,101 @@
+
+// Grunt / JavaScript tasks
+task npmInstall(type: NodeTask) {
+    args 'install'
+}
+
+task npmClean(type: Delete) {
+    delete 'node_modules'
+}
+
+task gruntInstall(type: NodeTask, dependsOn: npmInstall) {
+    args 'install', '-g', 'grunt-cli'
+}
+
+task bowerCliInstall(type: NodeTask, dependsOn: npmInstall) {
+    args 'install', '-g', 'bower'
+}
+
+task bowerInstallDeps(type: BowerTask, dependsOn: bowerCliInstall) {
+    doFirst {
+        delete fileTree(dir: 'web-app/vendor')
+    }
+    args 'install'
+}
+
+// Some of the bower dependencies include a bunch of files we don't need (for example, angular-ui includes
+// all the files in the git repo, not just the final .js and .min.js files), so let's delete files we don't need
+// to avoid including a bunch of unnecessary stuff in the .war file.
+bowerInstallDeps.doLast {
+    delete fileTree(dir: 'web-app/vendor/angular-ui', include: '**/*', exclude: 'build/*')
+}
+
+task bowerInstallDepsClean(type: Delete) {
+    delete 'web-app/vendor'
+}
+
+task gruntClean(type: GruntTask, dependsOn: gruntInstall) {
+    gruntArgs = 'clean:compiled'
+}
+
+task gruntCompile(type: GruntTask, dependsOn: [gruntInstall]) {
+    gruntArgs = 'prod-assemble'
+
+    //LESS source
+    inputs.dir 'src/less'
+    //JS source
+    inputs.dir 'src/js'
+
+    //LESS output
+    outputs.dir 'web-app/css'
+    //JS output
+    outputs.dir 'web-app/js'
+}
+
+
+task jsUnit(type: GruntTask, dependsOn: [gruntInstall, gruntCompile, bowerInstallDeps]) {
+    gruntArgs = 'karma:unit'
+
+    //Include all output of gruntCompile
+    inputs.files gruntCompile
+    //Include all the output of bowerInstallDeps
+    inputs.files bowerInstallDeps
+    //Include all the JS test code and configuration
+    inputs.dir 'test/js'
+
+    //Output is the test result report
+    outputs.dir "${buildDir}/test-results-js"
+}
+
+task jsHint(type: GruntTask, dependsOn: gruntInstall) {
+    gruntArgs = 'jshint'
+
+    //Input is all source JS files
+    inputs.files project.fileTree('src/js') {
+        include '**/*.js'
+    }
+
+    //Output in the jsHint report dir
+    outputs.dir "${buildDir}/reports/jshint"
+}
+
+task lessLint(type: GruntTask, dependsOn: [gruntInstall, gruntCompile]) {
+    gruntArgs = '-v lesslint'
+
+    //LESS source
+    inputs.dir 'src/less'
+
+    //Output is the csslint report dir
+    //TODO currently the
+    outputs.dir "${buildDir}/reports/csslint"
+}
+
+task starter(dependsOn: assemble)
+
+// Grunt / JS Task Dependencies
+classes.dependsOn bowerInstallDeps, gruntCompile
+check.dependsOn jsHint, lessLint
+clean.dependsOn gruntClean
+jsUnit.dependsOn bowerInstallDeps, gruntCompile, jsHint, lessLint
+test.dependsOn jsUnit
+assemble.dependsOn bowerInstallDeps

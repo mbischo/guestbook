@@ -1,0 +1,61 @@
+import com.bloomhealthco.build.*
+
+dependencies {
+    test"org.grails.plugins:geb:0.9.1"
+    test "org.grails.plugins:remote-control:1.4"
+    test "org.gebish:geb-spock:0.9.1"
+    test "org.gebish:geb-junit4:0.9.1"
+    test "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
+    test "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+    test "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+    test("com.github.detro.ghostdriver:phantomjsdriver:${phantomJsVersion}") {
+        transitive = false
+    }
+}
+
+task grailsTestFunctional(type: GrailsCustomResultsTask) {
+    inputs.source sourceSets.main.allSource
+    inputs.source sourceSets.test.allSource
+
+    inputs.dir 'src/js'
+    outputs.dir sourceSets.test.output.classesDir
+    outputs.dir sourceSets.main.output.classesDir
+    env = 'test'
+    dependsOn classes
+    command 'test-app-random-port'
+    testResultsDirName = 'test-results-functional'
+
+    String testName = System.getProperty('test.single', '')
+
+    args = "functional: ${testName}"
+    jvmOptions {
+        systemProperty "server.port", 0
+    }
+}
+
+task grailsTestFunctionalDebug(type: GrailsCustomResultsTask) {
+    outputs.upToDateWhen{ false }
+    inputs.source sourceSets.main.allSource
+    inputs.source sourceSets.test.allSource
+
+    outputs.dir sourceSets.test.output.classesDir
+    outputs.dir sourceSets.main.output.classesDir
+    env = 'test'
+    dependsOn classes
+    command 'test-app-random-port'
+    testResultsDirName = 'test-results-functional'
+
+    String testName = System.getProperty('test.single', '')
+
+    args = "functional: ${testName}"
+    jvmOptions {
+        debug = false
+        jvmArgs([
+                '-Xdebug',
+                '-Xnoagent',
+                '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005'
+        ])
+    }
+}
+
+test.dependsOn grailsTestFunctional

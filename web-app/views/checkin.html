@@ -1,0 +1,25 @@
+<div class="signin">
+	<form role="form" name="checkinForm" id="checkinForm">
+	<h2 id="sign-in-prompt">Sign in below</h2>
+	<div class="form-group">
+		<label class="sr-only" for="checkingIn.name">Name</label>
+		<input class="form-control" ng-model="checkingIn.name" placeholder="Your Name"/>
+	</div>
+	<div class="form-group">
+		<label class="sr-only" for="checkingIn.company">Company</label>
+		<input class="form-control" ng-model="checkingIn.company" placeholder="Company"/>
+	</div>
+	<div class="form-group">
+		<label class="sr-only" for="visiting_select">Company</label>
+		<select class="form-control" id="visiting_select" ng-model="checkingIn.visitedEmployee"
+                ng-options="e.firstName + ' ' + e.lastName for e in getEmployees() track by e.id"
+                data-placeholder="Who are you visiting?">
+		</select>
+	</div>
+
+	<button class="btn btn-primary btn-lg btn-block" ng-click="checkin()">Sign in</button>
+	</form>
+
+	<br/><br/>
+	<a class="center-block" href="#/">Cancel</a>
+</div>
