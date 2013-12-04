@@ -35,6 +35,12 @@ grails.mime.types = [
     xml:           ['text/xml', 'application/xml']
 ]
 
+grails.databinding.dateFormats = ['MMddyyyy',
+    "yyyy-MM-dd'T'hh:mm:ss.S'Z'",
+    'yyyy-MM-dd HH:mm:ss.S',
+    "yyyy-MM-dd'T'hh:mm:ss'Z'"
+    ]
+
 // URL Mapping Cache Max Size, defaults to 5000
 //grails.urlmapping.cache.maxsize = 1000
 
@@ -45,6 +51,8 @@ grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
 grails.views.default.codec = "none" // none, html, base64
 grails.views.gsp.encoding = "UTF-8"
 grails.converters.encoding = "UTF-8"
+grails.converters.json.default.deep = true
+//grails.converters.json.date = 'javascript'
 // enable Sitemesh preprocessing of GSP pages
 grails.views.gsp.sitemesh.preprocess = true
 // scaffolding templates configuration

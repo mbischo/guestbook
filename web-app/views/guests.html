@@ -15,8 +15,8 @@
                     <td class="col-xs-2">{{guest.name}}</td>
                     <td class="col-xs-2">{{guest.company}}</td>
                     <td class="col-xs-4 visiting">{{guest.visitedEmployee.firstName}} {{guest.visitedEmployee.lastName}}</td>
-                    <td class="col-xs-2">{{guest.checkinTime}}</td>
-                    <td class="col-xs-2">{{guest.checkoutTime}}</td>
+                    <td class="col-xs-2">{{guest.checkinTime | date: 'EEE h:mm a'}}</td>
+                    <td class="col-xs-2"><button type="button" class="btn btn-primary btn-xs" ng-click="checkout(guest.id)">Sign out</button></td>
                 </tr>
             </tbody>
         </table>

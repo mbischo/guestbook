@@ -12,6 +12,7 @@ class Guest {
     Employee visitedEmployee
 
     static constraints = {
+        checkoutTime(nullable: true)
     }
 
     static mapping = {

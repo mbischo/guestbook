@@ -12,7 +12,7 @@
 	<div class="form-group">
 		<label class="sr-only" for="visiting_select">Company</label>
 		<select class="form-control" id="visiting_select" ng-model="checkingIn.visitedEmployee"
-                ng-options="e.firstName + ' ' + e.lastName for e in getEmployees() track by e.id"
+                ng-options="e.firstName + ' ' + e.lastName for e in employees track by e.id"
                 data-placeholder="Who are you visiting?">
 		</select>
 	</div>
