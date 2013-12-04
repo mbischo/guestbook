@@ -28,9 +28,7 @@ environments {
     development {
         dataSource {
             dbCreate = "none" // one of 'create', 'create-drop','update'
-            def jdbcUrl = "jdbc:mysql://vagrant.moolb.com/bloomguest?autoReconnect=true"
-            url = jdbcUrl
-
+            url = "jdbc:mysql://vagrant.moolb.com/bloomguest?autoReconnect=true"
             username = "bloomguest"
             password = "password"
 
