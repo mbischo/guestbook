@@ -3,17 +3,18 @@
 	<h2 id="sign-in-prompt">Sign in below</h2>
 	<div class="form-group">
 		<label class="sr-only" for="checkingIn.name">Name</label>
-		<input class="form-control" ng-model="checkingIn.name" placeholder="Your Name"/>
+		<input class="signin form-control" ng-model="checkingIn.name" placeholder="Your Name"/>
 	</div>
 	<div class="form-group">
 		<label class="sr-only" for="checkingIn.company">Company</label>
-		<input class="form-control" ng-model="checkingIn.company" placeholder="Company"/>
+		<input class="signin form-control" ng-model="checkingIn.company" placeholder="Company"/>
 	</div>
 	<div class="form-group">
 		<label class="sr-only" for="visiting_select">Company</label>
-		<select class="form-control" id="visiting_select" ng-model="checkingIn.visitedEmployee"
+		<select class="signin form-control" id="visiting_select" ng-model="checkingIn.visitedEmployee"
                 ng-options="e.firstName + ' ' + e.lastName for e in employees track by e.id"
                 data-placeholder="Who are you visiting?">
+            <option value="">-- Visiting --</option>
 		</select>
 	</div>
 

@@ -23,6 +23,10 @@ angular.module('guestbookApp', [
                         templateUrl: 'views/guests.html',
                         controller: 'GuestsCtrl'
                     })
+                    .when('/employees', {
+                        templateUrl: 'views/employees.html',
+                        controller: 'EmployeesCtrl'
+                    })
                     .otherwise({
                         redirectTo: '/'
                     });

@@ -67,6 +67,23 @@ body {
         width:70%;
 }
 
+#checkout_button {
+  display: block;
+  position: absolute;
+  top: 16px;
+  right: 30px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+#guests-title {
+  background: url(/images/guests.png) no-repeat 0 center;
+  height: 70px;
+  display: block;
+  text-indent: -9999px;
+  margin-left: -3px;
+}
+
 .btn-primary {
   .gradient(left, #F15623, #FA7041);
   border: 1px solid #dd4614;
@@ -82,7 +99,7 @@ h2#sign-in-prompt {
         margin-top: 60px;
 }
 
-input, textarea, select {
+input.signin, textarea.signin, select.signin {
         width: 472px;
         font-size: 12px;
         line-height: 14px;

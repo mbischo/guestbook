@@ -1,0 +1,36 @@
+<div class="container">
+    <h2 id="employees-title">Employees</h2>
+    <input type="checkbox" ng-model="search.deleted"/>Show Deleted
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="col-xs-3"><input type="text" ng-model="newEmpFirstName"/></td>
+            <td class="col-xs-3"><input type="text" ng-model="newEmpLastName"/></td>
+            <td class="col-xs-3"><input type="text" ng-model="newEmpEmail"/></td>
+            <td class="col-xs-3"><button type="button" class="btn btn-primary btn-xs"
+                                         ng-click="addEmployee()">Add</button>
+            </td>
+        </tr>
+        <tr ng-repeat="employee in allEmployees | filter:search">
+            <td class="col-xs-3">{{employee.firstName}}</td>
+            <td class="col-xs-3">{{employee.lastName}}</td>
+            <td class="col-xs-3">{{employee.email}}</td>
+            <td class="col-xs-3">
+                <button type="button" class="btn btn-primary btn-xs"
+                 ng-if="!employee.deleted" ng-click="deleteEmployee(employee)">Delete</button>
+                <button type="button" class="btn btn-info btn-xs"
+                  ng-if="employee.deleted" ng-click="reviveEmployee(employee)">Revive</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary btn-xs" ng-click="goBack()">Back</button>
+</div>
