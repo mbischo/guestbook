@@ -29,8 +29,12 @@ angular.module('guestbookApp.controllers',
                     currentGuest.checkoutTime = new Date();
                     currentGuest.$save();
 
-                    $location.path('/');
+                    $scope.goBack();
                 });
+            };
+
+            $scope.goBack = function() {
+                $location.path('/');
             };
 
             $scope.manageEmployees = function() {
