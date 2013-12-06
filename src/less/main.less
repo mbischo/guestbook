@@ -117,6 +117,67 @@ select {
         width: 490px;
 }
 
+#list {
+  background: #fff;
+  height: 100%;
+  padding: 15px;
+  -webkit-box-shadow: 0 0 3px #444;
+  -webkit-border-radius: 5px;
+  -webkit-background-clip: padding-box;
+}
+
+#list table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 10px 10px;
+  vertical-align: middle;
+  text-shadow: 0 1px 1px #fff;
+}
+
+th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: normal;
+  color: #87B2A8;
+  padding-bottom: 22px;
+}
+
+td {
+  border-bottom: 1px solid #e7e7e7;
+  color: #555;
+  height: 35px;
+  color: #999;
+  font-size: 12px;
+}
+
+td.time {
+  font-size: 12px;
+  color: #999;
+}
+
+tr:nth-child(odd) td {
+  background: #f1f1f1;
+}
+
+tr.month td {
+  padding-top: 0;
+  padding-bottom: 0;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 11px;
+  line-height: 15px;
+  height: auto;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  color: #777;
+  font-style: italic;
+}
+
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
 .marketing,

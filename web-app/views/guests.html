@@ -1,6 +1,6 @@
-<div class="container">
-    <h2 id="guests-title">Guests</h2>
-    <a id="back_button" class="btn btn-primary upper_right_button" ng-click="goBack()">Back</a>
+<h2 id="guests-title">Guests</h2>
+<a id="back_button" class="btn btn-primary upper_right_button" ng-click="goBack()">Back</a>
+<div id="list" class="container">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -16,10 +16,10 @@
                     <td class="col-xs-2">{{guest.name}}</td>
                     <td class="col-xs-2">{{guest.company}}</td>
                     <td class="col-xs-4 visiting">{{guest.visitedEmployee.firstName}} {{guest.visitedEmployee.lastName}}</td>
-                    <td class="col-xs-2">{{guest.checkinTime | date: 'EEE h:mm a'}}</td>
+                    <td class="col-xs-2 time">{{guest.checkinTime | date: 'MMM dd, yyyy @ h:mm a'}}</td>
                     <td class="col-xs-2"><button type="button" class="btn btn-primary btn-xs" ng-click="checkout(guest.id)">Sign out</button></td>
                 </tr>
             </tbody>
         </table>
-        <a href="javascript:void();" ng-click="manageEmployees()">Manage</a>
 </div>
+<a href="javascript:void();" ng-click="manageEmployees()">Manage</a>
